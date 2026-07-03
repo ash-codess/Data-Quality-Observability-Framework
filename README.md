@@ -108,8 +108,8 @@ demonstrable portfolio piece. (GE can be layered back in later; see
 
 ```bash
 # 1. clone + enter
-git clone https://github.com/ash-codess/realtime-dq-observability.git
-cd realtime-dq-observability
+git clone https://github.com/ash-codess/Data-Quality-Observability-Framework.git
+cd Data-Quality-Observability-Framework
 
 # 2. virtual env
 python -m venv .venv
