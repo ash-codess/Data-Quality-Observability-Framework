@@ -1,0 +1,16 @@
+# Local orchestration (Windows / laptop) — no Spark, no thrift required.
+# The pipeline runs on Databricks serverless SQL warehouse via the Statement Execution API.
+databricks-sdk>=0.120.0
+python-dotenv>=1.0.0
+
+# --- Dev / test ---
+pytest>=8.0
+
+# --- Optional / environment-dependent ---------------------------------------
+# databricks-sql-connector  # nicer cursor API, but pulls in `thrift` (blocked by some
+#                           # corporate proxies). The SDK path avoids it entirely.
+# great-expectations>=1.5   # optional DQ engine; this project uses custom PySpark/SQL
+#                           # rules by default (more reliable on serverless).
+#
+# The Databricks-side notebooks (notebooks/*.py) run on serverless compute where
+# pyspark + delta-spark are pre-installed by the runtime — do NOT pip-install them locally.
