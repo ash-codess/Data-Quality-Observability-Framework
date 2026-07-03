@@ -25,16 +25,31 @@ ORDER BY check_hour, status;
 -- ---------------------------------------------------------------------
 -- TILE 2 — Failures by rule type  (bar chart)
 --   X: rule_name   Y: fail_count   (optionally color by layer)
+--   NOTE: aggregates are computed in a CTE and derived columns (fail_pct)
+--   in the outer query. This avoids UNSUPPORTED_FEATURE.LATERAL_COLUMN_ALIAS,
+--   which Lakeview raises when a widget references a SELECT alias
+--   (e.g. fail_count) inside an aggregate/measure.
 -- ---------------------------------------------------------------------
+WITH by_rule AS (
+  SELECT
+    rule_name,
+    layer,
+    count(*)                    AS total_checks,
+    count_if(status = 'FAIL')   AS fail_count,
+    count_if(status = 'WARN')   AS warn_count,
+    sum(failure_count)          AS total_failing_rows
+  FROM people_org.dq_observability.data_quality_metrics
+  GROUP BY rule_name, layer
+)
 SELECT
   rule_name,
   layer,
-  count(*)                                        AS total_checks,
-  count_if(status = 'FAIL')                       AS fail_count,
-  count_if(status = 'WARN')                       AS warn_count,
-  sum(failure_count)                              AS total_failing_rows
-FROM people_org.dq_observability.data_quality_metrics
-GROUP BY rule_name, layer
+  total_checks,
+  fail_count,
+  warn_count,
+  total_failing_rows,
+  round(100.0 * fail_count / total_checks, 1) AS fail_pct
+FROM by_rule
 ORDER BY fail_count DESC, warn_count DESC;
 
 

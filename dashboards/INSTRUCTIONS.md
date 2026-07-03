@@ -43,6 +43,15 @@ Click **Add visualization**, pick the dataset, then configure:
 For **Freshness lag trend**, add a reference line at `y = 24` (the SLA) so breaches are
 obvious. For **status** colors, map `PASS→green`, `WARN→amber`, `FAIL→red`.
 
+### Troubleshooting: `UNSUPPORTED_FEATURE.LATERAL_COLUMN_ALIAS`
+Lakeview throws this when a widget's measure references a `SELECT` alias (e.g. building
+a ratio from `fail_count`) and inlines it *inside* an aggregate. Two ways to avoid it:
+- Use the queries as written — TILE 2 pre-aggregates in a CTE and exposes `fail_pct`
+  directly, so you never need a calculated measure.
+- In the visualization, drag the already-aggregated column (e.g. `fail_count`) onto the
+  axis and set its aggregation to **Sum**; do **not** create a custom measure that
+  references another column's alias.
+
 ## 4. (Optional) Schedule a refresh
 Top-right **Schedule → Add schedule** → e.g. every hour on the serverless warehouse.
 Re-running `src/run_pipeline.py` (or the notebook job) appends new `run_id`s, so the
